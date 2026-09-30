@@ -7,7 +7,6 @@ import cn.mcxkly.classicandsimplestatusbars.overlays.FoodLevel;
 import cn.mcxkly.classicandsimplestatusbars.overlays.ThirstWasTakenUse;
 import com.alrex.parcool.ParCool;
 import com.elenai.feathers.Feathers;
-import com.github.L_Ender.cataclysm.Cataclysm;
 import com.legacy.blue_skies.BlueSkies;
 import com.mojang.logging.LogUtils;
 import de.teamlapen.vampirism.REFERENCE;
@@ -38,7 +37,6 @@ public class ClassicAndSimpleStatusBars {
     public static boolean parcool = false;
     public static boolean feathers = false;
     public static boolean mekanism = false;
-    public static boolean cataclysm = false;
     public static boolean blueSkies = false;
     public ClassicAndSimpleStatusBars() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -97,10 +95,6 @@ public class ClassicAndSimpleStatusBars {
             if ( ModList.get().isLoaded(Mekanism.MODID) ) {
                 LOGGER.info("CSSB: " + "Enable the Mekanism Armor Energy Value");
                 mekanism = true;
-            }
-            if ( ModList.get().isLoaded(Cataclysm.MODID) ) {
-                LOGGER.info("CSSB: " + "Enable the L_Ender's Cataclysm Sandstorm Value");
-                cataclysm = true;
             }
             if ( ModList.get().isLoaded(BlueSkies.MODID) ) {
                 LOGGER.info("CSSB: " + "Enable the BlueSkies ExtraHealth Value");

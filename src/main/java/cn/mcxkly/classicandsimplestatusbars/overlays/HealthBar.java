@@ -5,7 +5,6 @@ import cn.mcxkly.classicandsimplestatusbars.Config;
 import cn.mcxkly.classicandsimplestatusbars.other.helper;
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.client.ClientFeathersData;
-import com.github.L_Ender.cataclysm.Cataclysm;
 import com.legacy.blue_skies.BlueSkies;
 import com.legacy.blue_skies.capability.SkiesPlayer;
 import com.legacy.blue_skies.capability.util.ISkiesPlayer;
@@ -226,10 +225,8 @@ public class HealthBar implements IGuiOverlay {
         }
         int finalY = Y - 8;
         int finalX = x + 72; // 这是起源用的
-        if ( ClassicAndSimpleStatusBars.cataclysm ) {
-            if ( onmek ) {
-                finalY -= 10;
-            }
+        if ( onmek ) {
+            finalY -= 10; // 避让 Mekanism 能量条
         }
 
         if ( ClassicAndSimpleStatusBars.origins ) {

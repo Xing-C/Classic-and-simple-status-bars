@@ -13,7 +13,6 @@
     "ThirstBarRendererMixin",
     "ThirstHUDOverlayHandlerMixin",
     "VampirismMixin",
-    "CataclysmMixin",
     "MekMixin",
     "OverloadedArmorBarMixin"
   ],

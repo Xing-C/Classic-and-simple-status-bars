@@ -34,12 +34,11 @@
 - Support with the extra saturation of SuperSaturation mod
 - Support the absorption provided by BlueSkies mod, sourced from Nature Arc
 - Support the Armored energy bar of the Mekanism mod
-- Support the sandstorm status of the L_Ender'sCataclysm mod cosmetic Sandstorm In A Bottle
 - Support the Feather Endurance System brought by the Feathers mod
 - Support the Overloaded Armor Bar mod, so the armor bar is no longer drawn twice
 
 ### 📋Changelog
-#### v26.09.30.1
+#### v26.09.30.2
 **🆕 New Compatibility**
 - Overloaded Armor Bar: its armor bar is no longer drawn a second time — only this mod's style remains.
 - Ok Zoomer: works side by side, no more conflicts.
@@ -50,6 +49,7 @@
 
 **🔧 Improvements**
 - Optional mod support is now truly optional: players without those mods installed can still start the game normally — no errors, no crashes.
+- Removed the outdated L_Ender's Cataclysm integration (Cataclysm 3.x removed that sandstorm timer HUD itself).
 
 ### 🖼️Photo:
   ![0](/Textures/in/0.png)
