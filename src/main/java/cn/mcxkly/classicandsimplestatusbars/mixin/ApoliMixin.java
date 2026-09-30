@@ -1,7 +1,6 @@
 package cn.mcxkly.classicandsimplestatusbars.mixin;
 
 import cn.mcxkly.classicandsimplestatusbars.Config;
-import io.github.apace100.apoli.screen.PowerHudRenderer;
 import io.github.apace100.apoli.util.ApoliConfigs;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
@@ -11,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = PowerHudRenderer.class, remap = false)
+@Mixin(targets = "io.github.apace100.apoli.screen.PowerHudRenderer", remap = false)
 public abstract class ApoliMixin {
     boolean Only = false;
 

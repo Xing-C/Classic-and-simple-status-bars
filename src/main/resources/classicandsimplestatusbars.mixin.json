@@ -1,5 +1,5 @@
 {
-  "required": true,
+  "required": false,
   "package": "cn.mcxkly.classicandsimplestatusbars.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "classicandsimplestatusbars.refmap.json",
@@ -14,7 +14,8 @@
     "ThirstHUDOverlayHandlerMixin",
     "VampirismMixin",
     "CataclysmMixin",
-    "MekMixin"
+    "MekMixin",
+    "OverloadedArmorBarMixin"
   ],
   "minVersion": "0.8"
 }

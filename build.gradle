@@ -124,7 +124,8 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    maven { url "https://maven.merchantpug.net/releases" } // 起源-Forge
+    // 起源-Forge Greenhouse Maven
+    maven { url "https://maven.greenhouse.lgbt/releases" }
     mavenCentral()
 }
 
@@ -133,55 +134,55 @@ dependencies {
     // 调试 HUD Mod
     //runtimeOnly fg.deobf("curse.maven:giacomos-hud-overlays-configurator-901833:4766472")
     // GeckoLib
-    implementation fg.deobf("curse.maven:geckolib-388172:4711657") // geckolib-forge-1.20.1-4.2.2.jar
+    implementation fg.deobf("curse.maven:geckolib-388172:8285794") // geckolib-forge-1.20.1-4.8.4.jar
     // Curios API
-    implementation fg.deobf("curse.maven:curios-309927:4738776") // curios-forge-5.3.1+1.20.1.jar
+    implementation fg.deobf("curse.maven:curios-309927:6418456") // curios-forge-5.14.1+1.20.1.jar
     // Caelus API
-    implementation fg.deobf("curse.maven:caelus-308989:4581481") // caelus-forge-3.1.0+1.20.jar
+    implementation fg.deobf("curse.maven:caelus-308989:5281700") // caelus-forge-3.2.0+1.20.1.jar
 
     // 口渴 、 意志坚定
-    compileOnly fg.deobf("curse.maven:thirst-was-taken-679270:4721665") // ThirstWasTaken-1.20.1-1.3.2.jar
-    compileOnly fg.deobf("curse.maven:tough-as-nails-246391:4750298") // ToughAsNails-1.20.1-9.0.0.96.jar
+    compileOnly fg.deobf("curse.maven:thirst-was-taken-679270:6660408") // ThirstWasTaken-1.20.1-1.4.0.jar
+    compileOnly fg.deobf("curse.maven:tough-as-nails-246391:5815863") // ToughAsNails-1.20.1-9.2.0.171.jar
     // 稳态
-    implementation fg.deobf("curse.maven:homeostatic-634466:4738204") // homeostatic-1.20.1-2.9.5.0.jar
+    implementation fg.deobf("curse.maven:homeostatic-634466:7229376") // homeostatic-1.20.1-2.9.16.2.jar
     // 生存要素 - 有冲突,暂不打算
 //    implementation fg.deobf("curse.maven:survive-367337:4791291") // Survive-1.20.1-9.0.5.jar
 //    implementation fg.deobf("curse.maven:unionlib-367806:4789434") // UnionLib-1.20.1-10.2.2-Forge.jar
 
     // 测试用.
-    implementation fg.deobf("curse.maven:jei-238222:4712868")
-    compileOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.0")
-    compileOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.0:api")
-    runtimeOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.0")
-    implementation fg.deobf("curse.maven:jade-324717:4711195")
+    implementation fg.deobf("curse.maven:jei-238222:8778011") // jei-1.20.1-forge-15.56.0.205.jar
+    compileOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1")
+    compileOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api")
+    runtimeOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1")
+    implementation fg.deobf("curse.maven:jade-324717:8479276") // Jade-1.20.1-forge-11.13.3.jar
 
     // Apply Mixin AP
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
     // 奇异饰品
-    implementation fg.deobf("curse.maven:expandability-465066:4630724") // expandability-9.0.0.jar
-    implementation fg.deobf("curse.maven:architectury-api-419699:4663010") // Architectury API 9.1.12-forge.jar
-    implementation fg.deobf("curse.maven:cloth-config-348521:4633444") // Cloth-Config-11.1.106-forge.jar
-    implementation fg.deobf("curse.maven:artifacts-312353:4747012") // artifacts-forge-9.1.0.jar
+    implementation fg.deobf("curse.maven:expandability-465066:5301414") // expandability-9.0.4.jar
+    implementation fg.deobf("curse.maven:architectury-api-419699:5137938") // Architectury API 9.2.14-forge.jar
+    implementation fg.deobf("curse.maven:cloth-config-348521:5729105") // Cloth-Config-11.1.136-forge.jar
+    implementation fg.deobf("curse.maven:artifacts-312353:7903806") // artifacts-forge-9.5.19.jar
 
     // 跑酷
-    implementation fg.deobf("curse.maven:parcool-482378:5323148") // ParCool-1.20.1-3.2.1.2-R.jar
+    implementation fg.deobf("curse.maven:parcool-482378:7760589") // ParCool-1.20.1-3.4.3.3.jar
     // Feathers 羽毛耐力条
     implementation fg.deobf("curse.maven:feathers-699933:4814309") // feathers-1.1.jar
     // 依赖羽毛耐力条的闪避mod
     implementation fg.deobf("curse.maven:elenai-dodge-2-442962:4814313") // elenaidodge2-1.1.jar
 
 
-    // ScalingHealth-1.20.1-8.0.1+8.jar
-    implementation fg.deobf("curse.maven:scaling-health-248027:4669277")
+    // ScalingHealth-1.20.1-8.0.2+9.jar
+    implementation fg.deobf("curse.maven:scaling-health-248027:5065403")
     // 前置 silent-lib-1.20.1-8.0.0.jar
     implementation fg.deobf("curse.maven:silent-lib-242998:4585754")
 
-    // 吸血鬼 1.20.1-1.9.3.jar
-    implementation fg.deobf("curse.maven:vampirism-become-a-vampire-233029:4799959")
+    // 吸血鬼 Vampirism-1.20.1-1.10.17.jar
+    implementation fg.deobf("curse.maven:vampirism-become-a-vampire-233029:8814208")
 
-    // Mekanism-1.20.1-10.4.8.43.jar
-    implementation fg.deobf("curse.maven:mekanism-268560:5395221")
+    // Mekanism-1.20.1-10.4.16.80.jar
+    implementation fg.deobf("curse.maven:mekanism-268560:6552911")
 
     // 起源 origins-forge
 //    jarJar('io.github.edwinmindcraft:apoli-forge:1.20.1-2.9.0.1') {
@@ -190,21 +191,25 @@ dependencies {
 //    jarJar('io.github.edwinmindcraft:calio-forge:1.20.1-1.11.0.0') {
 //        jarJar.ranged(it, '[1.20.1-1.11.0,)')
 //    }
-    implementation fg.deobf('io.github.edwinmindcraft:apoli-forge:1.20.1-2.9.0.1')
-    implementation fg.deobf('io.github.edwinmindcraft:calio-forge:1.20.1-1.11.0.0')
-    implementation fg.deobf("io.github.edwinmindcraft:origins-forge:1.20.1-1.10.0.1")
+    implementation fg.deobf('io.github.edwinmindcraft:apoli-forge:1.20.1-2.9.0.5')
+    implementation fg.deobf('io.github.edwinmindcraft:calio-forge:1.20.1-1.11.0.3')
+    implementation fg.deobf("io.github.edwinmindcraft:origins-forge:1.20.1-1.10.0.6")
 
-    // 过饱和，超级饱食度
+    // 过饱和，超级饱食度 supersaturation-1.20.1-5.0.0.jar
     implementation fg.deobf("curse.maven:super-saturation-431906:4998350")
 
-    // 蔚蓝皓空
-    implementation fg.deobf("curse.maven:blue-skies-312918:5010316") // blue_skies-1.20.1-1.3.31.jar
-    implementation fg.deobf("curse.maven:structure-gel-api-378802:5278429") // structure_gel-1.20.1-2.16.2.jar
+    // 蔚蓝皓空 blue_skies-1.20.1-1.3.31.jar / structure_gel-1.20.1-2.16.2.jar
+    implementation fg.deobf("curse.maven:blue-skies-312918:5010316")
+    implementation fg.deobf("curse.maven:structure-gel-api-378802:5278429")
 
-    // 灾变
-    implementation fg.deobf("curse.maven:lendercataclysm-551586:5474791") // L_Enders_Cataclysm-1.99.6-1.20.1.jar
-    implementation fg.deobf("curse.maven:lionfish-api-1001614:5363774") // lionfishapi-1.9.jar
+    // 灾变 L_Enders_Cataclysm-3.31.jar / lionfishapi-3.0.jar
+    implementation fg.deobf("curse.maven:lendercataclysm-551586:8246047")
+    implementation fg.deobf("curse.maven:lionfish-api-1001614:8095554")
 
+    // 过载盔甲条 Overloaded Armor Bar - overloadedarmorbar-1.20.1-1.jar (1.20.1 Forge 唯一文件)
+    implementation fg.deobf("curse.maven:overloaded-armor-bar-314002:4631133")
+    // Ok Zoomer 缩放 - ok_zoomer-forge-5.4.0-beta.9.jar
+    implementation fg.deobf("curse.maven:ok-zoomer-354047:7682985")
 
 }
 /**/

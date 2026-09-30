@@ -6,9 +6,6 @@ import cn.mcxkly.classicandsimplestatusbars.other.helper;
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.client.ClientFeathersData;
 import com.github.L_Ender.cataclysm.Cataclysm;
-import com.github.L_Ender.cataclysm.capabilities.Gone_With_SandstormCapability;
-import com.github.L_Ender.cataclysm.config.CMConfig;
-import com.github.L_Ender.cataclysm.init.ModCapabilities;
 import com.legacy.blue_skies.BlueSkies;
 import com.legacy.blue_skies.capability.SkiesPlayer;
 import com.legacy.blue_skies.capability.util.ISkiesPlayer;
@@ -19,7 +16,6 @@ import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.Mekanism;
 import mekanism.common.item.gear.ItemMekaSuitArmor;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -50,9 +46,8 @@ public class HealthBar implements IGuiOverlay {
 
     private static final ResourceLocation feathers = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
 
-    private static final ResourceLocation POWER_BAR = new ResourceLocation(Mekanism.MODID, "textures/gui/icons/basic_universal_cable.png");
+    private static final ResourceLocation POWER_BAR = new ResourceLocation(Mekanism.MODID, "gui/icons/basic_universal_cable.png");
 
-    private static final ResourceLocation SANDSTORM_ICON = new ResourceLocation(Cataclysm.MODID,"textures/gui/sandstorm_icons.png");
     private static final ResourceLocation BLUE_SKIES_ICONS = new ResourceLocation(BlueSkies.MODID,"textures/gui/icons.png");
 
     private float intermediateHealth = 0;
@@ -225,34 +220,15 @@ public class HealthBar implements IGuiOverlay {
             if ( !capacity.isZero() ) { // 如果有能量要渲染
                 onmek = true;
                 int mektext = (int) Math.round(stored.divide(capacity).doubleValue() * 100.0);
-                guiGraphics.blit(POWER_BAR, x + 72, y - 10 , 0, 0, 7, 9, 16, 16);
+                guiGraphics.blit(POWER_BAR, x + 72, y - 10 , 0, 0, 8, 9, 16, 16);
                 guiGraphics.drawString(font, mektext + "%", x + 74 - font.width(mektext + "%"), y - 9, Config.Color_Armor, false);
             }
         }
         int finalY = Y - 8;
         int finalX = x + 72; // 这是起源用的
         if ( ClassicAndSimpleStatusBars.cataclysm ) {
-            int offsetY = 0;
             if ( onmek ) {
                 finalY -= 10;
-                offsetY = 10;
-            }
-            Gone_With_SandstormCapability.IGone_With_SandstormCapability SandstormCapability = ModCapabilities.getCapability(player, ModCapabilities.GONE_WITH_SANDSTORM_CAPABILITY);
-            if ( SandstormCapability != null ) {
-                // 灾变
-                double flytime = Math.abs(SandstormCapability.getSandstormTimer());
-                double maxProgressTime = CMConfig.Sandstorm_In_A_Bottle_Timer;
-                int ctext = (int) Math.round(100 - ((flytime / maxProgressTime) * 100.0));
-                if ( ctext != 100 ) {
-                    guiGraphics.blit(SANDSTORM_ICON, x + 72, y - 10 - offsetY, !SandstormCapability.isSandstorm() && ctext != 100 ? 9 : 0, 0, 9, 9, 32, 16);
-                    guiGraphics.drawString(font, ctext + "%", x + 72  - font.width(ctext + "%"), y - 9 -offsetY, Config.Color_Armor, false);
-                    // 起源兼容
-                    if ( onmek ) {
-                        finalX -= (8 + font.width(ctext + "%"));
-                    } else {
-                        finalY -= 10;
-                    }
-                }
             }
         }
 
@@ -310,6 +286,10 @@ public class HealthBar implements IGuiOverlay {
         //if (healthProportion + intermediateProportion > 1) intermediateProportion = 1 - healthProportion;
         int healthWidth = (int) Math.ceil(80 * healthProportion);
         int intermediateWidth = (int) Math.ceil(80 * intermediateProportion);
+        // 夹住：血量段 + 过渡段之和不许超过整条宽度 80。
+        // 两段各自 Math.ceil 会多算 1px，不夹的话空条宽度会变成负数、过渡条也会画到条外。
+        if ( healthWidth + intermediateWidth > 80 ) intermediateWidth = 80 - healthWidth;
+        if ( intermediateWidth < 0 ) intermediateWidth = 0;
         // Display empty part
         guiGraphics.blit(emptyHealthBarLocation,
                 x + healthWidth + intermediateWidth, y,
@@ -345,19 +325,14 @@ public class HealthBar implements IGuiOverlay {
                     absorptionWidth, 5,
                     80, 5);
         }
-        int InsWidth = 0;
-        float Inshealth = 0;
-        if ( absorption > 0 ) {
-            InsWidth = absorptionWidth;
-            Inshealth = absorption;
-        } else {
-            InsWidth = healthWidth;
-            Inshealth = health;
-        }
-        // Display intermediate part
+        // 动画目标值：有吸收时跟随吸收条顶端，否则跟随当前血量
+        float Inshealth = absorption > 0 ? absorption : health;
+        // 过渡条的锚点必须是"当前血量条"的右端 healthWidth，而不是吸收条宽度。
+        // 原来用 InsWidth（= absorptionWidth）做锚点，吸收顶满时它等于 80，
+        // 过渡段就被画到 x+80 之外，血条看起来凭空长出一截。
         guiGraphics.blit(intermediateHealthBarLocation,
-                x + InsWidth, y,
-                InsWidth, 0,
+                x + healthWidth, y,
+                healthWidth, 0,
                 intermediateWidth, 5,
                 80, 5);
         // Update intermediate health

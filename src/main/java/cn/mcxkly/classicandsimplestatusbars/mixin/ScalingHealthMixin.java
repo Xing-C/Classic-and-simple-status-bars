@@ -1,13 +1,12 @@
 package cn.mcxkly.classicandsimplestatusbars.mixin;
 
 import cn.mcxkly.classicandsimplestatusbars.Config;
-import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = HeartDisplayHandler.class, remap = false)
+@Mixin(targets = "net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler", remap = false)
 public class ScalingHealthMixin {
     @Inject(method = "onHealthBar", at = @At("HEAD"), cancellable = true)
     private void onHealthBar(CallbackInfo ci) {

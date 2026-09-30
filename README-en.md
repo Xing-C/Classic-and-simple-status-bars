@@ -36,6 +36,20 @@
 - Support the Armored energy bar of the Mekanism mod
 - Support the sandstorm status of the L_Ender'sCataclysm mod cosmetic Sandstorm In A Bottle
 - Support the Feather Endurance System brought by the Feathers mod
+- Support the Overloaded Armor Bar mod, so the armor bar is no longer drawn twice
+
+### 📋Changelog
+#### v26.09.30.1
+**🆕 New Compatibility**
+- Overloaded Armor Bar: its armor bar is no longer drawn a second time — only this mod's style remains.
+- Ok Zoomer: works side by side, no more conflicts.
+
+**🐛 Fixes**
+- Fixed the Mekanism equipment energy icon showing as a black box with a purple stripe at the bottom; it now displays correctly.
+- Fixed the health bar being drawn too long, with an extra segment on the right, when damage absorption is active.
+
+**🔧 Improvements**
+- Optional mod support is now truly optional: players without those mods installed can still start the game normally — no errors, no crashes.
 
 ### 🖼️Photo:
   ![0](/Textures/in/0.png)
