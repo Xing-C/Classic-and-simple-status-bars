@@ -24,7 +24,6 @@ public class IconManager {
     public void renderIcon(GuiGraphics guiGraphics, String name, int x, int y) {
         Icon icon = icons.get(name);
         if (icon != null) {
-            textureManager.bindForSetup(icon.getResourceLocation());
             guiGraphics.blit(icon.getResourceLocation(), x, y, icon.getU(), icon.getV(), icon.getWidth(), icon.getHeight(), icon.getTextureWidth(), icon.getTextureHeight());
         }
     }

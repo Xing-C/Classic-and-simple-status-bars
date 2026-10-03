@@ -2,19 +2,18 @@
   "required": false,
   "package": "cn.mcxkly.classicandsimplestatusbars.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "classicandsimplestatusbars.refmap.json",
   "mixins": [],
   "client": [
+    "ArtifactsCooldownMixin",
     "HomeostaticMixin",
-    "ApoliMixin",
-    "ArtifactsMixin",
-    "ParCoolMixin",
-    "ScalingHealthMixin",
+    "LegendarySurvivalOverhaulMixin",
+    "LegendarySurvivalOverhaulColdHungerMixin",
     "ThirstBarRendererMixin",
     "ThirstHUDOverlayHandlerMixin",
-    "VampirismMixin",
-    "MekMixin",
-    "OverloadedArmorBarMixin"
+    "VampirismMixin"
   ],
+  "injectors": {
+    "defaultRequire": 1
+  },
   "minVersion": "0.8"
 }

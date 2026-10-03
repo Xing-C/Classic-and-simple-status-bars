@@ -1,117 +1,65 @@
 plugins {
     id 'java-library'
-    id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    // 1.21.1 官方推荐构建插件
+    id 'net.neoforged.moddev' version '2.0.91'
 }
 
-group = mod_group_id
 version = mod_version
+group = mod_group_id
 
 base {
-    archivesName = mod_id  + "-Forge" // 只是为了区分
+    archivesName = mod_id + "-NeoForge"
 }
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-// jarJar.enable()
+// 1.20.5 起官方运行时为 Java 21
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    // The mappings can be changed at any time and must be in the following format.
-    // Channel:   Version:
-    // official   MCVersion             Official field/method names from Mojang mapping files
-    // parchment  YYYY.MM.DD-MCVersion  Open community-sourced parameter names and javadocs layered on top of official
-    //
-    // You must be aware of the Mojang license when using the 'official' or 'parchment' mappings.
-    // See more information here: https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
-    //
-    // Parchment is an unofficial project maintained by ParchmentMC, separate from MinecraftForge
-    // Additional setup is needed to use their mappings: https://parchmentmc.org/docs/getting-started
-    //
-    // Use non-default mappings at your own risk. They may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: mapping_channel, version: mapping_version
 
-    // When true, this property will have all Eclipse/IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
-    // In most cases, it is not necessary to enable.
-    // enableEclipsePrepareRuns = true
-    // enableIdeaPrepareRuns = true
+neoForge {
+    version = project.neo_version
 
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-    copyIdeResources = true
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
 
-    // When true, this property will add the folder name of all declared run configurations to generated IDE run configurations.
-    // The folder name can be set on a run configuration using the "folderName" property.
-    // By default, the folder name of a run configuration is the name of the Gradle project containing it.
-    // generateRunFolders = true
+    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
-    // This property enables access transformers for use in development.
-    // They will be applied to the Minecraft artifact.
-    // The access transformer file can be anywhere in the project.
-    // However, it must be at "META-INF/accesstransformer.cfg" in the final mod jar to be loaded by Forge.
-    // This default location is a best practice to automatically put the file in the right place in the final jar.
-    // See https://docs.neoforged.net/docs/1.20.x/advanced/accesstransformers/ for more information.
-
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
     runs {
-        // applies to all the run configs below
-        configureEach {
-            workingDirectory project.file("run/${it.name}")
-
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            gameDirectory = project.file('run/client')
+            if (project.hasProperty('qpWorld')) {
+                programArguments.addAll '--quickPlaySingleplayer', project.property('qpWorld')
             }
         }
 
-        client {
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', mod_id
-            arg "-mixin.config=classicandsimplestatusbars.mixin.json"
-        }
-
         server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            arg "-mixin.config=classicandsimplestatusbars.mixin.json"
-            args '--nogui'
-        }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            gameDirectory = project.file('run/server')
         }
 
         data {
-            // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
-            // workingDirectory project.file('run-data')
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
 
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'forge.logging.console.level', 'debug'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
         }
     }
 }
@@ -124,99 +72,67 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    // 起源-Forge Greenhouse Maven
     maven { url "https://maven.greenhouse.lgbt/releases" }
     mavenCentral()
 }
 
 dependencies {
-    minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
-    // 调试 HUD Mod
-    //runtimeOnly fg.deobf("curse.maven:giacomos-hud-overlays-configurator-901833:4766472")
     // GeckoLib
-    implementation fg.deobf("curse.maven:geckolib-388172:8285794") // geckolib-forge-1.20.1-4.8.4.jar
+    implementation "curse.maven:geckolib-388172:8893490" // neoforge-1.21.1-4.9.3
     // Curios API
-    implementation fg.deobf("curse.maven:curios-309927:6418456") // curios-forge-5.14.1+1.20.1.jar
+    implementation "curse.maven:curios-309927:6529130" // curios-neoforge-9.5.1+1.21.1.jar
     // Caelus API
-    implementation fg.deobf("curse.maven:caelus-308989:5281700") // caelus-forge-3.2.0+1.20.1.jar
+    implementation "curse.maven:caelus-308989:5694215" // caelus-neoforge-7.0.1+1.21.1.jar
 
     // 口渴 、 意志坚定
-    compileOnly fg.deobf("curse.maven:thirst-was-taken-679270:6660408") // ThirstWasTaken-1.20.1-1.4.0.jar
-    compileOnly fg.deobf("curse.maven:tough-as-nails-246391:5815863") // ToughAsNails-1.20.1-9.2.0.171.jar
+    compileOnly "curse.maven:thirst-was-taken-679270:7017923" // ThirstWasTaken-1.21.1-2.1.5.jar
+    compileOnly "curse.maven:tough-as-nails-246391:5833252" // ToughAsNails-1.21.1-10.1.0.13
     // 稳态
-    implementation fg.deobf("curse.maven:homeostatic-634466:7229376") // homeostatic-1.20.1-2.9.16.2.jar
-    // 生存要素 - 有冲突,暂不打算
-//    implementation fg.deobf("curse.maven:survive-367337:4791291") // Survive-1.20.1-9.0.5.jar
-//    implementation fg.deobf("curse.maven:unionlib-367806:4789434") // UnionLib-1.20.1-10.2.2-Forge.jar
+    // 2.12.0.0 删掉了 subSeason 的 null 检查, 无季节模组时玩家进世界会 NPE, 故锁在 2.11.0.10
+    compileOnly "curse.maven:homeostatic-634466:8287460" // homeostatic-neoforge-1.21.1-2.11.0.10.jar
+
+    // 传说生存 Legendary Survival Overhaul - legendarysurvivaloverhaul-1.21.1-2.4.7.2.jar
+    implementation "curse.maven:legendary-survival-overhaul-840254:8597620"
+    // 静谧四季 SereneSeasons-neoforge-1.21.1-10.1.0.3.jar
+    implementation "curse.maven:serene-seasons-291874:6182596"
+    implementation "curse.maven:glitchcore-955399:8109792"
 
     // 测试用.
-    implementation fg.deobf("curse.maven:jei-238222:8778011") // jei-1.20.1-forge-15.56.0.205.jar
-    compileOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1")
-    compileOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1:api")
-    runtimeOnly fg.deobf("squeek.appleskin:appleskin-forge:mc1.20.1-2.5.1")
-    implementation fg.deobf("curse.maven:jade-324717:8479276") // Jade-1.20.1-forge-11.13.3.jar
-
-    // Apply Mixin AP
-    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+    implementation "curse.maven:jei-238222:8792638" // jei-1.21.1-neoforge-19.51.0.418.jar
+    compileOnly "squeek.appleskin:appleskin-neoforge:mc1.21-3.0.9"
+    compileOnly "squeek.appleskin:appleskin-neoforge:mc1.21-3.0.9:api"
+    runtimeOnly "squeek.appleskin:appleskin-neoforge:mc1.21-3.0.9"
+    implementation "curse.maven:jade-324717:8591319" // Jade-1.21.1-NeoForge-15.10.6.jar
+    runtimeOnly "curse.maven:imblocker-483760:9033584" // IMBlocker-5.6.2.1-neoforge+1.20.6-1.21.8.jar
+    runtimeOnly "curse.maven:just-enough-characters-250702:8771217" // jecharacters-1.21.1-neoforge-4.5.29.jar
 
     // 奇异饰品
-    implementation fg.deobf("curse.maven:expandability-465066:5301414") // expandability-9.0.4.jar
-    implementation fg.deobf("curse.maven:architectury-api-419699:5137938") // Architectury API 9.2.14-forge.jar
-    implementation fg.deobf("curse.maven:cloth-config-348521:5729105") // Cloth-Config-11.1.136-forge.jar
-    implementation fg.deobf("curse.maven:artifacts-312353:7903806") // artifacts-forge-9.5.19.jar
+    implementation "curse.maven:expandability-465066:5428824" // expandability-neoforge-12.0.0.jar
+    implementation "curse.maven:architectury-api-419699:8492726" // architectury-13.0.11-neoforge.jar
+    implementation "curse.maven:cloth-config-348521:5729127" // ClothConfigNeoForge-15.0.140.jar
+    implementation "curse.maven:artifacts-312353:8791899" // artifacts-neoforge-13.2.5.jar
 
     // 跑酷
-    implementation fg.deobf("curse.maven:parcool-482378:7760589") // ParCool-1.20.1-3.4.3.3.jar
-    // Feathers 羽毛耐力条
-    implementation fg.deobf("curse.maven:feathers-699933:4814309") // feathers-1.1.jar
-    // 依赖羽毛耐力条的闪避mod
-    implementation fg.deobf("curse.maven:elenai-dodge-2-442962:4814313") // elenaidodge2-1.1.jar
+    compileOnly "curse.maven:parcool-482378:7478606" // ParCool-1.21.1-3.4.3.1-NF.jar
 
+    // 吸血鬼 Vampirism-1.21-1.10.13.jar
+    compileOnly "curse.maven:vampirism-233029:8814121"
 
-    // ScalingHealth-1.20.1-8.0.2+9.jar
-    implementation fg.deobf("curse.maven:scaling-health-248027:5065403")
-    // 前置 silent-lib-1.20.1-8.0.0.jar
-    implementation fg.deobf("curse.maven:silent-lib-242998:4585754")
+    // Mekanism-1.21.1-10.7.19.85.jar
+    implementation "curse.maven:mekanism-268560:7904058"
 
-    // 吸血鬼 Vampirism-1.20.1-1.10.17.jar
-    implementation fg.deobf("curse.maven:vampirism-become-a-vampire-233029:8814208")
+    // 过载盔甲条 Overloaded Armor Bar - overloadedarmorbar-neoforge-1.21-2.jar
+    compileOnly "curse.maven:overloaded-armor-bar-314002:5537850"
+    // Ok Zoomer 缩放 - ok_zoomer-neoforge-10.0.0-beta.13+neo.jar
+    compileOnly "curse.maven:ok-zoomer-354047:7676612"
 
-    // Mekanism-1.20.1-10.4.16.80.jar
-    implementation fg.deobf("curse.maven:mekanism-268560:6552911")
-
-    // 起源 origins-forge
-//    jarJar('io.github.edwinmindcraft:apoli-forge:1.20.1-2.9.0.1') {
-//        jarJar.ranged(it, '[1.20.1-2.9.0,)')
-//    }
-//    jarJar('io.github.edwinmindcraft:calio-forge:1.20.1-1.11.0.0') {
-//        jarJar.ranged(it, '[1.20.1-1.11.0,)')
-//    }
-    implementation fg.deobf('io.github.edwinmindcraft:apoli-forge:1.20.1-2.9.0.5')
-    implementation fg.deobf('io.github.edwinmindcraft:calio-forge:1.20.1-1.11.0.3')
-    implementation fg.deobf("io.github.edwinmindcraft:origins-forge:1.20.1-1.10.0.6")
-
-    // 过饱和，超级饱食度 supersaturation-1.20.1-5.0.0.jar
-    implementation fg.deobf("curse.maven:super-saturation-431906:4998350")
-
-    // 蔚蓝皓空 blue_skies-1.20.1-1.3.31.jar / structure_gel-1.20.1-2.16.2.jar
-    implementation fg.deobf("curse.maven:blue-skies-312918:5010316")
-    implementation fg.deobf("curse.maven:structure-gel-api-378802:5278429")
-
-    // 过载盔甲条 Overloaded Armor Bar - overloadedarmorbar-1.20.1-1.jar (1.20.1 Forge 唯一文件)
-    implementation fg.deobf("curse.maven:overloaded-armor-bar-314002:4631133")
-    // Ok Zoomer 缩放 - ok_zoomer-forge-5.4.0-beta.9.jar
-    implementation fg.deobf("curse.maven:ok-zoomer-354047:7682985")
-
+    // 1.21.1 暂无可用版本, 已移除支持:
+    //   Feathers (699933) / Elenai Dodge 2 (442962) / Scaling Health (248027) / Silent Lib (242998)
+    //   Super Saturation (431906) / Blue Skies (312918) / Structure Gel API (378802)
+    //   Origins / Apoli / Calio (1.21.1 仅 Fabric, NeoForge 侧无版本)
 }
-/**/
-mixin {
-    add sourceSets.main, "classicandsimplestatusbars.refmap.json"
-    config 'classicandsimplestatusbars.mixin.json'
-}
+
 // This block of code expands all declared replace properties in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
-// When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
-// See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
             minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
@@ -227,7 +143,10 @@ tasks.withType(ProcessResources).configureEach {
     ]
     inputs.properties replaceProperties
 
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    // 固定过滤编码: 不设则跟随 Gradle JVM 的默认编码, 中文注释在 GBK 下会被写坏, 导致 FML 解析 mods.toml 失败
+    filteringCharset = 'UTF-8'
+
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
 }
@@ -242,21 +161,10 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs"            : "classicandsimplestatusbars.mixin.json"
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-
-    // This is the preferred method to reobfuscate your jar file
-    finalizedBy 'reobfJar'
 }
-
-tasks.jarJar.configure {
-}
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
-// tasks.named('publish').configure {
-//     dependsOn 'reobfJar'
-// }
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
@@ -275,3 +183,4 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+tasks.register('idePostSync') {}

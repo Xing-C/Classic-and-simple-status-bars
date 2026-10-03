@@ -1,0 +1,56 @@
+modLoader="javafml" #mandatory
+# A version range to match for said mod loader - for regular FML @Mod mods it should be javafml
+loaderVersion="[4,)" #mandatory
+# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+license="GPL-3.0-only"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]] #mandatory
+# The modid of the mod
+modId="classicandsimplestatusbars" #mandatory
+# The version number of the mod
+version="${mod_version}" #mandatory
+# A display name for the mod
+displayName="Classic and simple status bars" #mandatory
+# A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+# A file name (in the root of the mod JAR) containing a logo for display
+logoFile="image.png" #optional
+# A text field displayed in the mod UI
+#credits="" #optional
+# A text field displayed in the mod UI
+authors="XingChen, Lanfix" #optional
+# Display Test controls the display for your mod in the server connection screen
+# MATCH_VERSION means that your mod will cause a red X if the versions on client and server differ.
+# IGNORE_SERVER_VERSION means that your mod will not cause a red X if it's present on the server but not on the client.
+# IGNORE_ALL_VERSION means that your mod will not cause a red X if it's present on the client or the server.
+# NONE means that no display test is set on your mod.
+displayTest="IGNORE_ALL_VERSION" # MATCH_VERSION is the default if nothing is specified (#optional)
+
+# The description text for the mod (multi line!) (#mandatory)
+description='''Redeveloped the Vanilla Health and Hunger columns, and added other content to display'''
+
+[[mixins]]
+config="classicandsimplestatusbars.mixin.json"
+
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.classicandsimplestatusbars]] #optional
+# the modid of the dependency
+modId="neoforge" #mandatory
+# Does this dependency have to exist - if not, ordering below must be specified
+type="required" #mandatory
+# The version range of the dependency
+versionRange="[21.1.0,)" #mandatory
+# An ordering relationship for the dependency - BEFORE or AFTER required if the dependency is not mandatory
+ordering="NONE"
+# Side this dependency is applied on - BOTH, CLIENT, or SERVER
+side="BOTH"
+
+[[dependencies.classicandsimplestatusbars]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
