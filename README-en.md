@@ -31,6 +31,7 @@
 - Artifacts: displays the flight time and popped state of the Helium Flamingo;
 - Overloaded Armor Bar: avoids a duplicated armor bar;
 - Legendary Survival Overhaul: takes over its thirst and cold-hunger bars, and supports the broken heart / shield and the Thirst / Heat Thirst icons;
+- AppleSkin: cancels its overlay previews on the hunger bar to avoid duplicated hunger and saturation displays;
 - All of the above are **optional dependencies**: the game starts normally without them.
 
 #### 1.20.x branch only
