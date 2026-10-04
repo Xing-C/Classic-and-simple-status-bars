@@ -1,66 +1,110 @@
-## 🌐[简体中文](https://github.com/Xing-C/Classic-and-simple-status-bars)  English (No Good, Help Me)
-## Classic and simple status bars
+## 🌐[简体中文](https://github.com/Xing-C/Classic-and-simple-status-bars/blob/main/README.md)  English
+
+## [CSSB]Classic and simple status bars
+
 ![logo](/src/main/resources/image.png)
 
-### This project is based on the modification of the [SimpleHealthBar](https://github.com/Lanfix8/SimpleHealthBar-Forge) Mod produced By Lanfix8If you are looking for other versions or originals, please visit: [SimpleHealthBar](https://github.com/Lanfix8/SimpleHealthBar-Forge)
+### This mod is based on the open-source [SimpleHealthBar](https://github.com/Lanfix8/SimpleHealthBar-Forge) with modifications, and is released with the permission of its author [@Lanfix8](https://github.com/Lanfix8).
 
-### 🪶Support Version
-- Supports Version 1.20-1.20.1 Forge And NeoForged
-- Supports Version 1.20-1.20.2 Fabric (ItSOverNow)
-- Supports Future Minecraft Versions
+> Each Minecraft version is a **separate mod**, and they are not interchangeable. This repository (the `main` branch) and this document cover **Minecraft 1.20 - 1.20.1 / Forge**.
+
+### 🌈Features
+
+#### Basic Display
+
+- Configurable function switches and text colour formats: almost every text colour can be set individually;
+- Texture changes based on debuffs: withering, poisoning, freezing and starvation;
+- Displays health as a number, and can show health above 20 points;
+- Displays absorption;
+- Displays hunger, its maximum and its exhaustion (configurable);
+- Displays saturation;
+- Displays the remaining air percentage in all kinds of situations;
+- Displays armor value and armor toughness;
+- Displays mount health when riding a horse or anything else (the current and max values are coloured independently).
+
+#### Mod Integrations
+
+- Thirst / Tough As Nails / Homeostatic: displays their hydration value;
+- Vampirism: displays the blood-drinking bar and takes over the hunger display once the player is infected;
+- ParCool: stamina shown in a new way (when the render type is not Normal), with a separate switch and colours;
+- Mekanism: displays the equipment energy bar, with a separate switch and colour;
+- Artifacts: displays the flight time of the Helium Flamingo;
+- Dehydration: displays its thirst value;
+- Super Saturation: merges the extra saturation into the saturation display;
+- Blue Skies: merges the nature absorption granted by accessories into the absorption display;
+- Feathers: displays the feather endurance system, on the same row as armor weight;
+- Origins: displays the class ability bar;
+- Scaling Health: suppresses its heart bar rendering;
+- Overloaded Armor Bar: avoids a duplicated armor bar;
+- Legendary Survival Overhaul: takes over its thirst and cold-hunger bars, and supports the broken heart / shield and the Thirst / Heat Thirst icons;
+- AppleSkin: cancels its overlay previews on the hunger bar to avoid duplicated hunger and saturation displays;
+- All of the above are **optional dependencies**: the game starts normally without them.
+
+### 🪶Supported Versions
+
+Each Minecraft version is a separate mod — please download the one that matches your game version:
+
+- **Minecraft 1.20 - 1.20.1** — Forge / NeoForged loaders (this branch, `main`, this document);
+- **Minecraft 1.21.1** — NeoForge loader (the `1.21.1` branch);
+- **Minecraft 1.20 - 1.20.2** — Fabric loader (the `1.20.x-Fabric` branch, discontinued);
+- Plans to support future versions.
 
 #### ⏬Download
+
 - [Modrinth](https://modrinth.com/mod/cssb)
+- [MCMOD](https://www.mcmod.cn/class/12121.html)
 - [CurseForge](https://curseforge.com/minecraft/mc-mods/classic-and-simple-status-bars)
 
-### 🌈Support Functions
-- Support Function switches, text color formatting；
-- Support Texture changes such as withering, poisoning, freezing, and starvation
-- Support Breaking through 20 health maximum operating conditions
-- Support Health Absorption
-- Support Hunger/Max and Exhaustion (configurable)
-- Support Saturation
-- Support Air conditions
-- Support The maximum operating condition of MountHealth
-- Support Armor value
-- Support Armor Toughness
-- Support Thirst levels provided Mod Thirst and Tough As Nails or Homeostatic
-- Support Dehydration (Fabric)
-- Support THE CLASS ABILITY BAR FOR THE Origins MOD
-- Support Vampire mod, vampire blood-drinking slot
-- Support flamingo flight status, from Artifacts Mod
-- Support for parkour mod stamina (when renderType is not normal) is now displayed in a new way
-- Support for ScalingHealth Mod, Disable Its Heart Container Rendering
-- Support with the extra saturation of SuperSaturation mod
-- Support the absorption provided by BlueSkies mod, sourced from Nature Arc
-- Support the Armored energy bar of the Mekanism mod
-- Support the Feather Endurance System brought by the Feathers mod
-- Support the Overloaded Armor Bar mod, so the armor bar is no longer drawn twice
-
 ### 📋Changelog
-#### v26.09.30.2
+
+#### v26.10.04.1
+
 **🆕 New Compatibility**
-- Overloaded Armor Bar: its armor bar is no longer drawn a second time — only this mod's style remains.
+
+- Legendary Survival Overhaul: takes over its thirst and cold-hunger bars, and supports the broken heart / shield and the Thirst / Heat Thirst icons;
+
+**🐛 Fixes**
+
+- Fixed the Artifacts Helium Flamingo cooldown progress display.
+- Fixed a long-standing issue with icon offset calculations.
+
+#### v26.09.30.2
+
+**🆕 New Compatibility**
+
+- Overloaded Armor Bar: its armor bar is no longer drawn a second time — only this mod's style remains;
 - Ok Zoomer: works side by side, no more conflicts.
 
 **🐛 Fixes**
-- Fixed the Mekanism equipment energy icon showing as a black box with a purple stripe at the bottom; it now displays correctly.
+
+- Fixed the Mekanism equipment energy icon showing as a black box with a purple stripe at the bottom — it now displays correctly;
 - Fixed the health bar being drawn too long, with an extra segment on the right, when damage absorption is active.
 
 **🔧 Improvements**
-- Optional mod support is now truly optional: players without those mods installed can still start the game normally — no errors, no crashes.
+
+- Optional mod support is now truly optional: players without those mods installed can still start the game normally — no errors, no crashes;
 - Removed the outdated L_Ender's Cataclysm integration (Cataclysm 3.x removed that sandstorm timer HUD itself).
 
-### 🖼️Photo:
-  ![0](/Textures/in/0.png)
-  ![1](/Textures/in/1.png)
-  ![2](/Textures/in/2.png)
-  ![3](/Textures/in/3.png)
-  ![4](/Textures/in/4.png)
-  ![5](/Textures/in/5.png)
-  ![6](/Textures/in/6.png)
-  ![7](/Textures/in/7.png)
-  ![8](/Textures/in/8.png)
-  ![9](/Textures/in/9.png)
+### 🖼️Showcase:
 
-# 😀Wishing you a wonderful day!
+![0](/Textures/in/0.png)
+
+![1](/Textures/in/1.png)
+
+![2](/Textures/in/2.png)
+
+![3](/Textures/in/3.png)
+
+![4](/Textures/in/4.png)
+
+![5](/Textures/in/5.png)
+
+![6](/Textures/in/6.png)
+
+![7](/Textures/in/7.png)
+
+![8](/Textures/in/8.png)
+
+![9](/Textures/in/9.png)
+
+# 😀You received a blessing — wishing you a wonderful day!

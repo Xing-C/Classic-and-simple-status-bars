@@ -7,6 +7,7 @@ import artifacts.platform.PlatformServices;
 import artifacts.registry.ModGameRules;
 import cn.mcxkly.classicandsimplestatusbars.ClassicAndSimpleStatusBars;
 import cn.mcxkly.classicandsimplestatusbars.Config;
+import cn.mcxkly.classicandsimplestatusbars.other.LsoIcons;
 import cn.mcxkly.classicandsimplestatusbars.other.helper;
 import com.alrex.parcool.ParCool;
 import com.alrex.parcool.client.hud.impl.HUDType;
@@ -32,6 +33,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import sfiomn.legendarysurvivaloverhaul.registry.MobEffectRegistry;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -220,19 +222,35 @@ public class FoodLevel implements IGuiOverlay {
         }
     }
 
-    private void renderFood(Font font, GuiGraphics guiGraphics, int x, int y, Player player) {
-        y += 1;
-        String text;
+    /** 鸡腿图标: 严寒时换成传说生存的冷冻鸡腿, 对方自带金边素材; 其余情况用原版图标 */
+    private void renderFoodIcon(GuiGraphics guiGraphics, int iconX, int iconY, Player player) {
+        boolean cold = ClassicAndSimpleStatusBars.legendarysurvivaloverhaul
+                && player.hasEffect(MobEffectRegistry.COLD_HUNGER.get());
+        if ( cold ) {
+            guiGraphics.blit(LsoIcons.LSO_ICONS, iconX, iconY,
+                    LsoIcons.FOOD_COLD_U, LsoIcons.FOOD_COLD_V, 9, 9, LsoIcons.SIZE, LsoIcons.SIZE); // 冷冻鸡腿
+            if ( player.getFoodData().getSaturationLevel() > 0 ) {
+                guiGraphics.blit(LsoIcons.LSO_ICONS, iconX, iconY,
+                        LsoIcons.FOOD_GOLD_U, LsoIcons.FOOD_GOLD_V, 9, 9, LsoIcons.SIZE, LsoIcons.SIZE); // 冷冻鸡腿-金边
+            }
+            return;
+        }
         guiGraphics.blit(guiIconsLocation,
-                x, y - 10,
+                iconX, iconY,
                 16, 27,
                 9, 9,
                 256, 256); // 鸡腿图标-背景
         guiGraphics.blit(guiIconsLocation,
-                x, y - 10,
+                iconX, iconY,
                 52, 27,
                 9, 9,
                 256, 256); // 鸡腿图标
+    }
+
+    private void renderFood(Font font, GuiGraphics guiGraphics, int x, int y, Player player) {
+        y += 1;
+        String text;
+        renderFoodIcon(guiGraphics, x, y - 10, player); // 鸡腿图标
 
         AtomicInteger AddedHunger = new AtomicInteger();
         AtomicReference<Float> AddedSat = new AtomicReference<>(0.0f);
@@ -292,27 +310,25 @@ public class FoodLevel implements IGuiOverlay {
         if ( ArtifactsAir && Config.Artifacts_On ) {
             SwimData swimData = PlatformServices.platformHelper.getSwimData(player);
             if ( swimData != null ) {
-                int swimTime = swimData.getSwimTime();
-                int maxProgressTime;
-                if ( swimTime != 0 ) {
+                int swimTime = swimData.getSwimTime(); // 正 = 本次飞行已用刻数, 负 = 回充剩余刻数, 0 = 已充满
+                if ( swimTime != 0 ) { // 充满时不渲染
                     int AirY = y;
                     if ( Config.Air_On && player.getAirSupply() < 300 ) AirY -= 10; // 如果渲染了氧气值，在渲染时高度 + 10
                     if ( !StopConflictRendering ) AirY -= 10; // 如果口渴/意志坚定存在，在渲染时高度 + 10
-                    if ( swimTime > 0 ) {
-                        maxProgressTime = Math.max(1, ModGameRules.HELIUM_FLAMINGO_FLIGHT_DURATION.get() * 20);
-                    } else {
-                        maxProgressTime = Math.max(1, ModGameRules.HELIUM_FLAMINGO_RECHARGE_DURATION.get() * 20);
-                    }
-                    int swimTimes = swimTime * 100 / maxProgressTime;
-                    swimTimes = (swimTimes <= 0 ? -1 : 100 - swimTimes);
+                    boolean recharging = swimTime < 0; // 回充中 = 泳圈不可用
+                    // GameRule 自 9.5.x 起已做 秒→刻 换算, 此处不再乘 20
+                    int fullTime = recharging
+                            ? Math.max(20, ModGameRules.HELIUM_FLAMINGO_RECHARGE_DURATION.get())
+                            : Math.max(1, ModGameRules.HELIUM_FLAMINGO_FLIGHT_DURATION.get());
+                    int swimTimes = 100 - Math.min(100, Math.abs(swimTime) * 100 / fullTime); // 剩余可用比例
                     String texts = Math.max(swimTimes, 0) + ""; //防止负数
                     guiGraphics.drawString(font, "%", x + 70 - font.width("%"), AirY - 9, Config.Color_Artifacts_Symbol, false);
                     guiGraphics.drawString(font, texts, x + 70 - font.width(texts) - font.width("%"), AirY - 9, Config.Color_Artifacts, false);
                     guiGraphics.blit(HELIUM_FLAMINGO_ICON,
                             x + 70, AirY - 10,
-                            (swimTimes < 0 ? 9 : 0), 0,
+                            (recharging ? 9 : 0), 0,
                             9, 9,
-                            32, 16); // 烈火鸟 泳圈
+                            32, 16); // 烈火鸟 泳圈: u=0 完整 / u=9 破裂
                     isArtifactsAir = font.width(texts);
                 } else {
                     isArtifactsAir = 0;
@@ -346,8 +362,8 @@ public class FoodLevel implements IGuiOverlay {
                                 if ( !StopConflictRendering ) AirY -= 10; // 如果口渴/意志坚定存在，在渲染时高度 + 10
                                 if ( isArtifactsAir != 0 ) AirX -= (font.width("99%") + 9/* 图标宽9 */); // isArtifactsAir 如果渲染泳圈, 为了美观手动改一下吧。
                                 texts = String.valueOf((int)(staminaScale / 20)); // max 2000 / 20
-                                guiGraphics.blit(STAMINA, AirX + 70, AirY - 9, (float) textureX, 119.0F, 9, 9, 129, 128);
-                                guiGraphics.drawString(font, texts, AirX + 70 - font.width(texts), AirY - 9, Config.Color_Artifacts, false);
+                                guiGraphics.blit(STAMINA, AirX + 70, AirY - 10, (float) textureX, 119.0F, 9, 9, 129, 128);
+                                guiGraphics.drawString(font, texts, AirX + 70 - font.width(texts), AirY - 9, Config.Color_Stamina, false);
                             }
                         }
                     }
@@ -373,20 +389,20 @@ public class FoodLevel implements IGuiOverlay {
                 float MountHealths = Math.min(FsMount.getHealth(), MountHealthsMax);
                 if ( MountHealths > 0 ) {
                     guiGraphics.blit(guiIconsLocation,
-                            x, y - 19,
+                            x, y - 20,
                             88, 9,
                             9, 9,
                             256, 256);
                     // 骑乘血量
                     String text_Mount = helper.KeepOneDecimal(MountHealths);
                     int X_Mount = x + 10;
-                    guiGraphics.drawString(font, text_Mount, X_Mount, y - 19, Config.Color_Health, false);
+                    guiGraphics.drawString(font, text_Mount, X_Mount, y - 19, Config.Color_Mount, false);
                     X_Mount += font.width(text_Mount);
                     text_Mount = Config.Interval_lll;
                     guiGraphics.drawString(font, text_Mount, X_Mount, y - 19, Config.Color_Interval_lll, false);
                     X_Mount += font.width(text_Mount);
                     text_Mount = helper.KeepOneDecimal(MountHealthsMax);
-                    guiGraphics.drawString(font, text_Mount, X_Mount, y - 19, Config.Color_Health_Tail, false);
+                    guiGraphics.drawString(font, text_Mount, X_Mount, y - 19, Config.Color_Mount_Tail, false);
                 }
                 NotAValidMount = true;
             }
@@ -400,12 +416,12 @@ public class FoodLevel implements IGuiOverlay {
                 }
                 if ( ARMORTOUGHNESS > 0 ) {
                     guiGraphics.blit(guiIconsLocation,
-                            x, y - 19,
+                            x, y - 20,
                             43, 9,
                             9, 9,
                             256, 256); // 护甲图标
                     guiGraphics.blit(guiIconsLocation,
-                            x, y - 19,
+                            x, y - 20,
                             43, 18,
                             9, 9,
                             256, 256); // 韧性图标
@@ -421,26 +437,26 @@ public class FoodLevel implements IGuiOverlay {
                 String FeathersValue = String.valueOf(Math.max(0, ClientFeathersData.getFeathers() + ClientFeathersData.getEnduranceFeathers() - ClientFeathersData.getWeight()));
                 if (player.hasEffect(FeathersEffects.COLD.get())){
                     // 无法重生羽毛
-                    /* 背景*/guiGraphics.blit(feathers, x + fx, y - 19 , 16, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19 , 34, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19 , 61, 9, 9, 9, 256, 256);
+                    /* 背景*/guiGraphics.blit(feathers, x + fx, y - 20 , 16, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20 , 34, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20 , 61, 9, 9, 9, 256, 256);
                     guiGraphics.drawString(font, FeathersValue, x + fx + 10, y - 19, Config.Color_Armor, false);
                 } else if ( player.hasEffect(FeathersEffects.ENDURANCE.get())) {
                     // 溢出羽毛
-                    /* 背景*/guiGraphics.blit(feathers, x + fx, y - 19 , 16, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19 , 34, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19 , 61, 0, 9, 9, 256, 256);
+                    /* 背景*/guiGraphics.blit(feathers, x + fx, y - 20 , 16, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20 , 34, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20 , 61, 0, 9, 9, 256, 256);
                     guiGraphics.drawString(font, FeathersValue, x + fx + 10, y - 19, Config.Color_Armor, false);
                 } else if ( player.hasEffect(FeathersEffects.ENERGIZED.get()) ) {
                     // 快速恢复
-                    /* 背景*/guiGraphics.blit(feathers, x + fx, y - 19 , 16, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19 , 34, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19 , 25, 18, 9, 9, 256, 256);
+                    /* 背景*/guiGraphics.blit(feathers, x + fx, y - 20 , 16, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20 , 34, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20 , 25, 18, 9, 9, 256, 256);
                     guiGraphics.drawString(font, FeathersValue, x + fx + 10, y - 19, Config.Color_Armor, false);
                 } else { // 默认图标
                     /* 背景*/
-                    guiGraphics.blit(feathers, x + fx, y - 19, 16, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, x + fx, y - 19, 34, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20, 16, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + fx, y - 20, 34, 0, 9, 9, 256, 256);
                     guiGraphics.drawString(font, FeathersValue, x + fx + 10, y - 19, Config.Color_Armor, false);
                 }
 

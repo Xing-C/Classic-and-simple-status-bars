@@ -1,6 +1,5 @@
 plugins {
     id 'java-library'
-    id 'eclipse'
     id 'idea'
     id 'maven-publish'
     id 'net.neoforged.gradle' version '[6.0.18,6.2)'
@@ -132,7 +131,7 @@ repositories {
 dependencies {
     minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
     // 调试 HUD Mod
-    //runtimeOnly fg.deobf("curse.maven:giacomos-hud-overlays-configurator-901833:4766472")
+    runtimeOnly fg.deobf("curse.maven:giacomos-hud-overlays-configurator-901833:4753039")
     // GeckoLib
     implementation fg.deobf("curse.maven:geckolib-388172:8285794") // geckolib-forge-1.20.1-4.8.4.jar
     // Curios API
@@ -140,11 +139,14 @@ dependencies {
     // Caelus API
     implementation fg.deobf("curse.maven:caelus-308989:5281700") // caelus-forge-3.2.0+1.20.1.jar
 
+    // 传说生存 Legendary Survival Overhaul - legendary-survival-overhaul-1.20.1-2.4.7.jar
+    implementation fg.deobf("curse.maven:legendary-survival-overhaul-840254:8591693")
+
     // 口渴 、 意志坚定
     compileOnly fg.deobf("curse.maven:thirst-was-taken-679270:6660408") // ThirstWasTaken-1.20.1-1.4.0.jar
     compileOnly fg.deobf("curse.maven:tough-as-nails-246391:5815863") // ToughAsNails-1.20.1-9.2.0.171.jar
     // 稳态
-    implementation fg.deobf("curse.maven:homeostatic-634466:7229376") // homeostatic-1.20.1-2.9.16.2.jar
+    compileOnly fg.deobf("curse.maven:homeostatic-634466:7229376") // homeostatic-1.20.1-2.9.16.2.jar
     // 生存要素 - 有冲突,暂不打算
 //    implementation fg.deobf("curse.maven:survive-367337:4791291") // Survive-1.20.1-9.0.5.jar
 //    implementation fg.deobf("curse.maven:unionlib-367806:4789434") // UnionLib-1.20.1-10.2.2-Forge.jar
@@ -174,12 +176,12 @@ dependencies {
 
 
     // ScalingHealth-1.20.1-8.0.2+9.jar
-    implementation fg.deobf("curse.maven:scaling-health-248027:5065403")
+    compileOnly fg.deobf("curse.maven:scaling-health-248027:5065403")
     // 前置 silent-lib-1.20.1-8.0.0.jar
-    implementation fg.deobf("curse.maven:silent-lib-242998:4585754")
+    compileOnly fg.deobf("curse.maven:silent-lib-242998:4585754")
 
     // 吸血鬼 Vampirism-1.20.1-1.10.17.jar
-    implementation fg.deobf("curse.maven:vampirism-become-a-vampire-233029:8814208")
+    compileOnly fg.deobf("curse.maven:vampirism-become-a-vampire-233029:8814208")
 
     // Mekanism-1.20.1-10.4.16.80.jar
     implementation fg.deobf("curse.maven:mekanism-268560:6552911")
@@ -226,6 +228,8 @@ tasks.withType(ProcessResources).configureEach {
             mod_authors         : mod_authors, mod_description: mod_description, pack_format_number: pack_format_number,
     ]
     inputs.properties replaceProperties
+
+    filteringCharset = 'UTF-8'
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
@@ -275,3 +279,4 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+tasks.register('idePostSync') {}

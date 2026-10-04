@@ -1,6 +1,7 @@
 package cn.mcxkly.classicandsimplestatusbars.overlays;
 
 import cn.mcxkly.classicandsimplestatusbars.Config;
+import cn.mcxkly.classicandsimplestatusbars.other.LsoIcons;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.ghen.thirst.foundation.common.capability.IThirst;
 import dev.ghen.thirst.foundation.common.capability.ModCapabilities;
@@ -12,6 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import sfiomn.legendarysurvivaloverhaul.api.thirst.ThirstUtil;
+import sfiomn.legendarysurvivaloverhaul.common.capabilities.thirst.ThirstCapability;
+import sfiomn.legendarysurvivaloverhaul.registry.MobEffectRegistry;
+import sfiomn.legendarysurvivaloverhaul.util.CapabilityUtil;
 import toughasnails.api.thirst.ThirstHelper;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +46,13 @@ public class ThirstWasTakenUse implements IGuiOverlay {
     }
 
     public static final ResourceLocation Homeostatic_Icons = new ResourceLocation("homeostatic:textures/gui/icons.png");
+
+
+    public static boolean LsoThirstIS = true; // 传说生存
+
+    public static void LsoThirstIDEA(boolean is) {
+        LsoThirstIS = is;
+    }
 
 
     @Override
@@ -99,6 +111,13 @@ public class ThirstWasTakenUse implements IGuiOverlay {
                         0, 9,
                         9, 9);
             });
+        } else if ( !LsoThirstIS ) { // 传说生存: 水分与饱和度
+            if ( !ThirstUtil.isThirstActive(player) ) return;
+            ThirstCapability thirstData = CapabilityUtil.getThirstCapability(player);
+            if ( thirstData == null ) return;
+            Thirst.set(thirstData.getHydrationLevel());
+            Quenched.set((int) thirstData.getSaturationLevel());
+            renderLsoThirstIcon(guiGraphics, x + 70, y - 10, player);
         } else return; // 如果两者都不在，并且也没有稳态，跳过渲染.
         if ( Quenched.get() > 0 ) { // 如果Quenched大于0渲染.
             int x2 = x + 70 - font.width(Quenched + Config.Interval_TTT) - font.width(String.valueOf(Thirst.get())); // 计算长度
@@ -106,9 +125,32 @@ public class ThirstWasTakenUse implements IGuiOverlay {
             x2 += font.width(Quenched + "");
             guiGraphics.drawString(font, Config.Interval_TTT, x2, y - 9, Config.Color_Interval_TTT, false);
         }
-        font.width("0.3");
         guiGraphics.drawString(font, String.valueOf(Thirst.get()), x + 70 - font.width(String.valueOf(Thirst.get())), y - 9, Config.Color_Thirst, false);
     }
+
+    /** 水分图标: 干渴转绿, 脱水转火焰; 两者同时存在时绿占上半、火焰占下半 */
+    private void renderLsoThirstIcon(GuiGraphics guiGraphics, int iconX, int iconY, Player player) {
+        boolean thirst = player.hasEffect(MobEffectRegistry.THIRST.get());
+        boolean heatThirst = player.hasEffect(MobEffectRegistry.HEAT_THIRST.get());
+        if ( thirst && heatThirst ) {
+            guiGraphics.enableScissor(iconX, iconY, iconX + 9, iconY + 5);
+            blitLsoThirstIcon(guiGraphics, iconX, iconY, LsoIcons.THIRST_GREEN_U, LsoIcons.THIRST_GREEN_V);
+            guiGraphics.disableScissor();
+            guiGraphics.enableScissor(iconX, iconY + 5, iconX + 9, iconY + 9);
+            blitLsoThirstIcon(guiGraphics, iconX, iconY, LsoIcons.THIRST_FLAME_U, LsoIcons.THIRST_FLAME_V);
+            guiGraphics.disableScissor();
+            return;
+        }
+        if ( thirst ) {
+            blitLsoThirstIcon(guiGraphics, iconX, iconY, LsoIcons.THIRST_GREEN_U, LsoIcons.THIRST_GREEN_V);
+        } else if ( heatThirst ) {
+            blitLsoThirstIcon(guiGraphics, iconX, iconY, LsoIcons.THIRST_FLAME_U, LsoIcons.THIRST_FLAME_V);
+        } else {
+            blitLsoThirstIcon(guiGraphics, iconX, iconY, LsoIcons.THIRST_U, LsoIcons.THIRST_V);
+        }
+    }
+
+    private void blitLsoThirstIcon(GuiGraphics guiGraphics, int iconX, int iconY, int u, int v) {
+        guiGraphics.blit(LsoIcons.LSO_ICONS, iconX, iconY, (float) u, (float) v, 9, 9, LsoIcons.SIZE, LsoIcons.SIZE);
+    }
 }
-
-

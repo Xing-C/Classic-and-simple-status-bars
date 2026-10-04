@@ -26,6 +26,10 @@ public class VanillaGuiHandler {
     private static final ResourceLocation toughasnailsl = new ResourceLocation("toughasnails", "thirst_level");
     private static final ResourceLocation feathers = new ResourceLocation("feathers", "feathers");
     private static final ResourceLocation blueskies = new ResourceLocation("blue_skies", "nature_arc_health_bonus");
+    // 传说生存: 血量改造 / 严寒饥饿 / 水分, 三层的显示都由本模组接管
+    private static final ResourceLocation lsoHealthOverhaul = new ResourceLocation("legendarysurvivaloverhaul", "health_overhaul");
+    private static final ResourceLocation lsoColdHunger = new ResourceLocation("legendarysurvivaloverhaul", "cold_hunger");
+    private static final ResourceLocation lsoThirst = new ResourceLocation("legendarysurvivaloverhaul", "thirst");
 
     @SubscribeEvent
     public static void disableVanillaAarmor(RenderGuiOverlayEvent.Pre event) {
@@ -38,7 +42,8 @@ public class VanillaGuiHandler {
                 if ( event.getOverlay().id().equals(vanillAarmor_level) ) {
                     event.setCanceled(true);
                 }
-                if ( event.getOverlay().id().equals(vanillaMount_health) ) {
+                if ( event.getOverlay().id().equals(vanillaMount_health) && Config.Food_On ) {
+                    // 仅在食物区被本模组接管时掐掉原版骑乘血量
                     event.setCanceled(true);
                 }
                 if ( event.getOverlay().id().equals(vanillaHealthBar) ) {
@@ -64,6 +69,18 @@ public class VanillaGuiHandler {
                 }
                 // 蔚蓝皓空
                 if ( event.getOverlay().id().equals(blueskies) ) {
+                    event.setCanceled(true);
+                }
+                // 传说生存 - 血量改造(破碎心/护盾)
+                if ( event.getOverlay().id().equals(lsoHealthOverhaul) && Config.Health_On ) {
+                    event.setCanceled(true);
+                }
+                // 传说生存 - 严寒饥饿条
+                if ( event.getOverlay().id().equals(lsoColdHunger) && Config.Food_On ) {
+                    event.setCanceled(true);
+                }
+                // 传说生存 - 水分
+                if ( event.getOverlay().id().equals(lsoThirst) ) {
                     event.setCanceled(true);
                 }
 

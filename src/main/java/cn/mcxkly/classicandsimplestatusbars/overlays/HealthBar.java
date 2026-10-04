@@ -2,6 +2,8 @@ package cn.mcxkly.classicandsimplestatusbars.overlays;
 
 import cn.mcxkly.classicandsimplestatusbars.ClassicAndSimpleStatusBars;
 import cn.mcxkly.classicandsimplestatusbars.Config;
+import cn.mcxkly.classicandsimplestatusbars.other.LsoHealth;
+import cn.mcxkly.classicandsimplestatusbars.other.LsoIcons;
 import cn.mcxkly.classicandsimplestatusbars.other.helper;
 import com.elenai.feathers.Feathers;
 import com.elenai.feathers.client.ClientFeathersData;
@@ -42,6 +44,8 @@ public class HealthBar implements IGuiOverlay {
     private static final ResourceLocation emptyHealthBarLocation = new ResourceLocation(ClassicAndSimpleStatusBars.MOD_ID, "textures/gui/healthbars/empty.png");
     private static final ResourceLocation absorptionBarLocation = new ResourceLocation(ClassicAndSimpleStatusBars.MOD_ID, "textures/gui/healthbars/absorption.png");
     private static final ResourceLocation guiIconsLocation = new ResourceLocation( "textures/gui/icons.png");
+    private static final int HEART_FULL_U = 52; // 原版红心
+    private static final int HEART_ABSORBING_U = 160; // 原版金心(伤害吸收)
 
     private static final ResourceLocation feathers = new ResourceLocation(Feathers.MODID, "textures/gui/icons.png");
 
@@ -51,12 +55,20 @@ public class HealthBar implements IGuiOverlay {
 
     private float intermediateHealth = 0;
 
+    // 传说生存: 破碎心颗数、护盾血量、被扣掉的生命上限, 每帧读一次
+    private int lsoBrokenHearts = 0;
+    private float lsoShieldHealth = 0F;
+    private float lsoMaxHealthLoss = 0F;
+    // 实际参与显示的吸收量: 有护盾时用护盾
+    private float absorption = 0F;
+
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
         if ( gui.shouldDrawSurvivalElements() ) {
             Font font = gui.getFont();
             Player player = (Player) Minecraft.getInstance().cameraEntity;
             if ( player == null ) return;
+            updateLsoState(player);
             int x = width / 2 - 91;
             int y = height - 39;
             y += 4;
@@ -70,12 +82,55 @@ public class HealthBar implements IGuiOverlay {
         }
     }
 
+    private void updateLsoState(Player player) {
+        if ( ClassicAndSimpleStatusBars.legendarysurvivaloverhaul && LsoHealth.overhaulEnabled() ) {
+            lsoBrokenHearts = LsoHealth.brokenHearts(player);
+            lsoShieldHealth = LsoHealth.shieldHealth(player);
+            lsoMaxHealthLoss = (float) LsoHealth.brokenHeartLoss(player);
+        } else {
+            lsoBrokenHearts = 0;
+            lsoShieldHealth = 0F;
+            lsoMaxHealthLoss = 0F;
+        }
+        absorption = lsoShieldHealth > 0F ? lsoShieldHealth : player.getAbsorptionAmount();
+    }
+
+    /**
+     * 数值左边的心形图标, 有破碎心/护盾时按半边拼接:
+     * 左半取破碎心(没有就红心), 右半取金心(没有就红心), 所以破碎与护盾能同时显示。
+     */
+    private void renderHeartIcon(GuiGraphics guiGraphics, int iconX, int iconY) {
+        boolean broken = lsoBrokenHearts > 0;
+        boolean shield = absorption > 0F;
+        if ( !broken && !shield ) {
+            guiGraphics.blit(guiIconsLocation, iconX, iconY, HEART_FULL_U, 0, 9, 9, 256, 256); // 红心图标
+            return;
+        }
+        guiGraphics.enableScissor(iconX, iconY, iconX + 4, iconY + 9);
+        if ( broken ) {
+            guiGraphics.blit(LsoIcons.LSO_ICONS, iconX, iconY,
+                    LsoIcons.BROKEN_HEART_U, LsoIcons.BROKEN_HEART_V, 9, 9, LsoIcons.SIZE, LsoIcons.SIZE); // 破碎心
+        } else {
+            guiGraphics.blit(guiIconsLocation, iconX, iconY, HEART_FULL_U, 0, 9, 9, 256, 256);
+        }
+        guiGraphics.disableScissor();
+        guiGraphics.enableScissor(iconX + 4, iconY, iconX + 9, iconY + 9);
+        guiGraphics.blit(guiIconsLocation, iconX, iconY, shield ? HEART_ABSORBING_U : HEART_FULL_U, 0, 9, 9, 256, 256);
+        guiGraphics.disableScissor();
+    }
+
     private void renderHealthValue_Easy(Font font, GuiGraphics guiGraphics, int x, int y, Player player) {
         y -= 2;
         float MaxHealth = player.getMaxHealth(); // 最大血量
         float Health = Math.min(player.getHealth(), MaxHealth); // 当前血量
-        float Absorption = player.getAbsorptionAmount(); // 吸收量
+        float Absorption = absorption; // 吸收量(有护盾时是护盾)
         int xx = x - 2;
+        // 破碎心扣掉的生命上限: 本模式由右向左拼, 先画的落在最大生命值右侧
+        if ( lsoMaxHealthLoss > 0F ) {
+            String lossText = Config.Interval_YYY + helper.KeepOneDecimal(lsoMaxHealthLoss);
+            xx = xx - font.width(lossText);
+            guiGraphics.drawString(font, lossText, xx, y - 1, Config.Color_Health_Broken, false);
+        }
         String text = helper.KeepOneDecimal(MaxHealth);
         xx = xx - font.width(text); // 要向左
         guiGraphics.drawString(font, text, xx, y - 1, Config.Color_Health, false);
@@ -110,8 +165,8 @@ public class HealthBar implements IGuiOverlay {
 
     private void renderHealthValue(Font font, GuiGraphics guiGraphics, int x, int Y, Player player,ForgeGui gui) {
         int y = Y + 1;
+        float Absorption = absorption; // 吸收量(有护盾时是护盾)
         float blueSkiesHealth = 0.0f;
-        float Absorption = player.getAbsorptionAmount(); // 吸收量
         if ( ClassicAndSimpleStatusBars.blueSkies ) {
             blueSkiesHealth = SkiesPlayer.getIfPresent(player, ISkiesPlayer ::getNatureHealth, () -> 0.0F);
         }
@@ -122,11 +177,7 @@ public class HealthBar implements IGuiOverlay {
                     9, 9); // 绿心图标
             Absorption += blueSkiesHealth;
         } else {
-            guiGraphics.blit(guiIconsLocation,
-                    x, y - 10,
-                    52, 0,
-                    9, 9,
-                    256, 256); // 红心图标
+            renderHeartIcon(guiGraphics, x, y - 10); // 心形图标: 破碎心占左半、护盾心占右半
         }
 
         float MaxHealth = player.getMaxHealth(); // 最大血量
@@ -165,40 +216,45 @@ public class HealthBar implements IGuiOverlay {
             text = helper.KeepOneDecimal(MaxHealth);
             guiGraphics.drawString(font, text, xx, y - 9, Config.Color_Health_Tail, false);
         }
+        // 破碎心扣掉的生命上限接在最大生命值后面
+        if ( lsoMaxHealthLoss > 0F ) {
+            String lossText = Config.Interval_YYY + helper.KeepOneDecimal(lsoMaxHealthLoss);
+            guiGraphics.drawString(font, lossText, xx + font.width(text), y - 9, Config.Color_Health_Broken, false);
+        }
         if ( ARMOR > 0 && Config.Armour_On ) {
             guiGraphics.drawString(font, helper.KeepOneDecimal(ARMOR), x + 10, y - 19, Config.Color_Armor, false);
             // 重量
             if(ClassicAndSimpleStatusBars.feathers && ClientFeathersData.getWeight() != 0) { // 当护甲和重量都在时
                 if ( ClientFeathersData.getWeight() == ARMOR) { // 大部分时候重量和护甲一样，图标渲染在一起，不渲染文字
                     guiGraphics.blit(guiIconsLocation,
-                            x, y - 19,
+                            x, y - 20,
                             43, 9,
                             4, 9,
                             256, 256); // 护甲图标
                     // 重量图标
-                    guiGraphics.blit(feathers, x + 4, y - 19 , 56, 9, 5, 9, 256, 256);
+                    guiGraphics.blit(feathers, x + 4, y - 20 , 56, 9, 5, 9, 256, 256);
                 } else { // 如果不一样的话，渲染文字
                     int fx = x + 6 + font.width(String.valueOf(ARMOR));
                     guiGraphics.blit(guiIconsLocation,
-                            x, y - 19,
+                            x, y - 20,
                             43, 9,
                             9, 9,
                             256, 256); // 护甲图标
                     // 重量
-                    /* 背景*/guiGraphics.blit(feathers, fx, y - 19 , 16, 0, 9, 9, 256, 256);
-                    guiGraphics.blit(feathers, fx, y - 19 , 52, 0, 9, 9, 256, 256);
+                    /* 背景*/guiGraphics.blit(feathers, fx, y - 20 , 16, 0, 9, 9, 256, 256);
+                    guiGraphics.blit(feathers, fx, y - 20 , 52, 0, 9, 9, 256, 256);
                     guiGraphics.drawString(font, String.valueOf(ClientFeathersData.getWeight()), fx + 10, y - 19, Config.Color_Armor, false);
                 }
-            } else if (!ClassicAndSimpleStatusBars.feathers) {
+            } else { // 没装羽毛，或装了羽毛但重量为 0 时，画完整护甲图标
                 guiGraphics.blit(guiIconsLocation,
-                        x, y - 19,
+                        x, y - 20,
                         43, 9,
                         9, 9,
                         256, 256); // 护甲图标
             }
         } else if (ClassicAndSimpleStatusBars.feathers && ClientFeathersData.getWeight() != 0) { // 当没有护甲并且也有重量时，一般不会触发。
-            /* 背景*/guiGraphics.blit(feathers, x, y - 19 , 16, 0, 9, 9, 256, 256);
-            guiGraphics.blit(feathers, x, y - 19 , 52, 0, 9, 9, 256, 256);
+            /* 背景*/guiGraphics.blit(feathers, x, y - 20 , 16, 0, 9, 9, 256, 256);
+            guiGraphics.blit(feathers, x, y - 20 , 52, 0, 9, 9, 256, 256);
             guiGraphics.drawString(font, String.valueOf(ClientFeathersData.getWeight()), x + 10, y - 19, Config.Color_Armor, false);
         }
         boolean onmek = false;
@@ -220,7 +276,7 @@ public class HealthBar implements IGuiOverlay {
                 onmek = true;
                 int mektext = (int) Math.round(stored.divide(capacity).doubleValue() * 100.0);
                 guiGraphics.blit(POWER_BAR, x + 72, y - 10 , 0, 0, 8, 9, 16, 16);
-                guiGraphics.drawString(font, mektext + "%", x + 74 - font.width(mektext + "%"), y - 9, Config.Color_Armor, false);
+                guiGraphics.drawString(font, mektext + "%", x + 74 - font.width(mektext + "%"), y - 9, Config.Color_Mekanism, false);
             }
         }
         int finalY = Y - 8;
@@ -301,7 +357,7 @@ public class HealthBar implements IGuiOverlay {
                 healthWidth, 5,
                 80, 5);
 
-        float absorption1 = player.getAbsorptionAmount();
+        float absorption1 = this.absorption;
         // 绿心
         float blueSkiesHealth = 0.0f;
         if ( ClassicAndSimpleStatusBars.blueSkies ) {

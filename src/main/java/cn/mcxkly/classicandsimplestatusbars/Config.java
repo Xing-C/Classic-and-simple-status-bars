@@ -72,6 +72,15 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\nThe color of the symbol '+'." +
                     "\n默认值(Default)：\"#F6E58D\"")
             .define("Color_Interval_String_2", "#F6E58D");
+    private static final ForgeConfigSpec.ConfigValue<String> Interval__Text3 = BUILDER
+            .pop(1)
+            .push("Interval_3")
+            .comment("定义'破碎心扣减的生命上限'所使用的符号，如：-4.0。" +
+                    "\nDefines the symbol used for the 'max health lost to broken hearts', e.g. -4.0." +
+                    "\n符号颜色沿用 Color_Health_Broken。" +
+                    "\nIts color follows Color_Health_Broken." +
+                    "\n默认值(Default)：Interval_String_3=\"-\"")
+            .define("Interval_String_3", "-");
     /*************************************/
 /*    private static final ForgeConfigSpec.BooleanValue supersaturation_On1 = BUILDER
             .pop(1)
@@ -191,6 +200,11 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\nIf set to false, the display of mount health values will be turned off." +
                     "\n默认值(Default)：true")
             .define("Mounts-functional-status", true);
+    private static final ForgeConfigSpec.BooleanValue ParCool_On1 = BUILDER
+            .comment("\n" + "如果设置为false,将关闭跑酷模组体力值的显示。" +
+                    "\nIf set to false, the display of the ParCool stamina value will be turned off." +
+                    "\n默认值(Default)：true")
+            .define("ParCool-functional-status", true);
     /*************************************/
     private static final ForgeConfigSpec.BooleanValue Health_On1 = BUILDER
             .pop(1)
@@ -204,6 +218,11 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\nIf set to false, the display of armor values is turned off" +
                     "\n默认值(Default)：true")
             .define("Armour-functional-status", true);
+    private static final ForgeConfigSpec.BooleanValue Mekanism_On1 = BUILDER
+            .comment("\n" + "如果设置为false,将关闭通用机械装备能量值的显示。" +
+                    "\nIf set to false, the display of the Mekanism equipment energy value will be turned off." +
+                    "\n默认值(Default)：true")
+            .define("Mekanism-functional-status", true);
     /*************************************/
     private static final ForgeConfigSpec.ConfigValue<String> Color_Health1 = BUILDER
             .pop(2)
@@ -222,6 +241,21 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\nMax Health value text color." +
                     "\n默认值(Default)：\"#FF1313\"")
             .define("Color_Health_Tail", "#FF1313");
+    private static final ForgeConfigSpec.ConfigValue<String> Color_Health_Broken1 = BUILDER
+            .comment("\n" + "破碎心扣减的生命上限文本颜色。" +
+                    "\nBroken heart max health penalty text color." +
+                    "\n默认值(Default)：\"#8C4A4A\"")
+            .define("Color_Health_Broken", "#8C4A4A");
+    private static final ForgeConfigSpec.ConfigValue<String> Color_Mount1 = BUILDER
+            .comment("\n" + "坐骑当前血量文本颜色。" +
+                    "\nMount health value text color." +
+                    "\n默认值(Default)：\"#B3473C\"")
+            .define("Color_Mount", "#B3473C");
+    private static final ForgeConfigSpec.ConfigValue<String> Color_Mount_Tail1 = BUILDER
+            .comment("\n" + "坐骑最大血量文本颜色。" +
+                    "\nMount Max Health value text color." +
+                    "\n默认值(Default)：\"#FF1313\"")
+            .define("Color_Mount_Tail", "#FF1313");
     private static final ForgeConfigSpec.ConfigValue<String> Color_Food1 = BUILDER
             .comment("\n" + "饱食度文本颜色。" +
                     "\nFood value text color." +
@@ -247,6 +281,11 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\nArmor Toughness value text color." +
                     "\n默认值(Default)：\"#BDECFC\"")
             .define("Color_Armor_Toughness", "#BDECFC");
+    private static final ForgeConfigSpec.ConfigValue<String> Color_Mekanism1 = BUILDER
+            .comment("\n" + "通用机械装备能量文本颜色。" +
+                    "\nMekanism equipment energy value text color." +
+                    "\n默认值(Default)：\"#DDEBEB\"")
+            .define("Color_Mekanism", "#DDEBEB");
     private static final ForgeConfigSpec.ConfigValue<String> Color_Air1 = BUILDER
             .comment("\n" + "氧气文本颜色。" +
                     "\nAir value text color." +
@@ -257,6 +296,11 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\nAir Symbol value text color." +
                     "\n默认值(Default)：\"#D1EBFF\"")
             .define("Color_Air_Symbol", "#D1EBFF");
+    private static final ForgeConfigSpec.ConfigValue<String> Color_Stamina1 = BUILDER
+            .comment("\n" + "跑酷模组体力值文本颜色。" +
+                    "\nParCool stamina value text color." +
+                    "\n默认值(Default)：\"#BE3D6F\"")
+            .define("Color_Stamina", "#BE3D6F");
 
     private static final ForgeConfigSpec.ConfigValue<String> Color_Food_ExhaustionLevel1 = BUILDER
             .comment("\n" + "食物消耗进度（疲劳值）的文本颜色。" +
@@ -264,15 +308,16 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
                     "\n默认值(Default)：\"#66C3CC\"")
             .define("Color_Food_ExhaustionLevel", "#66C3CC");
     static final ForgeConfigSpec SPEC = BUILDER.build();
-    public static String Interval_lll, Interval_TTT, Prefix_Health, Prefix_Food;
-    public static boolean /*feathers_On,supersaturation_On,*/ Food_ExhaustionLevel_On, Thirst_On, Artifacts_On, Origins_On, All_On, Bloodsucker_On, Food_On, Health_On, EasyMode_Text_On, Armour_On, Armor_Toughness_On, Air_On, Mounts_On;
-    public static int Color_Food_ExhaustionLevel, MaxFood_On, Color_Origins_Symbol, Color_Thirst_Quenched, Color_Thirst, Color_Artifacts, Color_Air, Color_Artifacts_Symbol, Color_Air_Symbol, Color_Vampires_Blood, Color_Vampires_MaxBlood, Color_Origins, Color_Health, Color_Health_Absorb, Color_Health_Tail, Color_Food, Color_Food_Saturation, Color_Food_Tail, Color_Armor, Color_Armor_Toughness, Color_Interval_lll, Color_Interval_TTT;
+    public static String Interval_lll, Interval_TTT, Interval_YYY, Prefix_Health, Prefix_Food;
+    public static boolean /*feathers_On,supersaturation_On,*/ Food_ExhaustionLevel_On, Thirst_On, Artifacts_On, Origins_On, All_On, Bloodsucker_On, Food_On, Health_On, EasyMode_Text_On, Armour_On, Armor_Toughness_On, Air_On, Mounts_On, ParCool_On, Mekanism_On;
+    public static int Color_Food_ExhaustionLevel, MaxFood_On, Color_Origins_Symbol, Color_Thirst_Quenched, Color_Thirst, Color_Artifacts, Color_Air, Color_Artifacts_Symbol, Color_Air_Symbol, Color_Vampires_Blood, Color_Vampires_MaxBlood, Color_Origins, Color_Health, Color_Health_Absorb, Color_Health_Tail, Color_Health_Broken, Color_Mount, Color_Mount_Tail, Color_Food, Color_Food_Saturation, Color_Food_Tail, Color_Armor, Color_Armor_Toughness, Color_Mekanism, Color_Stamina, Color_Interval_lll, Color_Interval_TTT;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         All_On = AllOn.get();
         Interval_lll = Interval_Textis.get();
         Interval_TTT = Interval__Text1.get();
+        Interval_YYY = Interval__Text3.get();
             /* 感觉完全没必要...
             Prefix_Health = Prefix_Health1.get();
             Prefix_Food = Prefix_Food1.get();
@@ -286,6 +331,8 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
         Armor_Toughness_On = Armor_Toughness_On1.get();
         Air_On = Air_On1.get();
         Mounts_On = Mounts_On1.get();
+        ParCool_On = ParCool_On1.get();
+        Mekanism_On = Mekanism_On1.get();
         Origins_On = Origins_On1.get();
         Artifacts_On = Artifact_On1.get();
         Thirst_On = Thirst_On1.get();
@@ -306,11 +353,16 @@ private static final ForgeConfigSpec.ConfigValue<String> Prefix_Food1 = BUILDER
         Color_Health = Integer.parseInt(Color_Health1.get().substring(1), 16);
         Color_Health_Absorb = Integer.parseInt(Color_Health_Absorb1.get().substring(1), 16);
         Color_Health_Tail = Integer.parseInt(Color_Health_Tail1.get().substring(1), 16);
+        Color_Health_Broken = Integer.parseInt(Color_Health_Broken1.get().substring(1), 16);
+        Color_Mount = Integer.parseInt(Color_Mount1.get().substring(1), 16);
+        Color_Mount_Tail = Integer.parseInt(Color_Mount_Tail1.get().substring(1), 16);
         Color_Food = Integer.parseInt(Color_Food1.get().substring(1), 16);
         Color_Food_Saturation = Integer.parseInt(Color_Food_Saturation1.get().substring(1), 16);
         Color_Food_Tail = Integer.parseInt(Color_Food_Tail1.get().substring(1), 16);
         Color_Armor = Integer.parseInt(Color_Armor1.get().substring(1), 16);
         Color_Armor_Toughness = Integer.parseInt(Color_Armor_Toughness1.get().substring(1), 16);
+        Color_Mekanism = Integer.parseInt(Color_Mekanism1.get().substring(1), 16);
+        Color_Stamina = Integer.parseInt(Color_Stamina1.get().substring(1), 16);
         Color_Interval_lll = Integer.parseInt(Color_Interval_String_1_.get().substring(1), 16);
         Color_Interval_TTT = Integer.parseInt(Color_Interval_String_2_.get().substring(1), 16);
         Color_Origins = Integer.parseInt(Color_Origins1.get().substring(1), 16);
